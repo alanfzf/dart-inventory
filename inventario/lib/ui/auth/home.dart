@@ -51,7 +51,7 @@ class HomeState extends State<Home>{
 
               //productos
               TileMenu(Icons.archive, "Agregar producto",
-                      ()=> Util.redirect(context, const ProdMenu(-1))),
+                      ()=> Util.redirect(context, const ProdMenu(-1, null))),
 
               TileMenu(Icons.search, "Buscar productos",
                       () => Util.redirect(context, const ProdList())),
@@ -59,7 +59,7 @@ class HomeState extends State<Home>{
               //categorias
               divider,
               TileMenu(Icons.category, "Agregar categoria",
-                      () => Util.redirect(context, const CatMenu(-1))),
+                      () => Util.redirect(context, const CatMenu(-1, null))),
 
               TileMenu(Icons.search, "Buscar categorías",
                       () => Util.redirect(context, const CatList())),
@@ -67,7 +67,7 @@ class HomeState extends State<Home>{
               //proveedores
               divider,
               TileMenu(Icons.person_add, "Agregar proveedor",
-                      () => Util.redirect(context, const SupMenu(-1))),
+                      () => Util.redirect(context, const SupMenu(-1, null))),
 
               TileMenu(Icons.person_search_rounded, "Buscar proveedores",
                       () => Util.redirect(context, const SupList())),
@@ -77,7 +77,6 @@ class HomeState extends State<Home>{
               TileMenu(Icons.settings, "Opciones", () { }),
               TileMenu(Icons.logout, "Cerrar sesión",
                       () => Util.redirect(context, const Login()))
-
             ],
           ),
         ),

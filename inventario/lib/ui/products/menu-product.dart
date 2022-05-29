@@ -1,16 +1,23 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:inventario/data/product.dart';
+import 'package:inventario/data/category.dart';
 
+import '../../util//http-man.dart';
 import '../../util/api-util.dart';
+import '../../data/product.dart';
 import '../../util/util.dart';
 import '../widgets/common.dart';
 
 
+final select = Category(-1, "Selecciona una categoría");
+
+
 class ProdMenu extends StatefulWidget{
-    final int prod;
-    const ProdMenu(this.prod, {Key? key}) : super(key: key);
+    final int prodId;
+    final Product? product; 
+
+    const ProdMenu(this.prodId, this.product, {Key? key}) : super(key: key);
 
     @override
     ProdMenuState createState() => ProdMenuState();
@@ -19,16 +26,16 @@ class ProdMenu extends StatefulWidget{
 class ProdMenuState extends State<ProdMenu>{
 
   int idProd = -1;
+  bool loaded = false;
   File? img;
-  Product? product;
-  ImageProvider imgProv = const AssetImage('assets/add_img.png');
+  Category selectedCat = select;
+  ImageProvider imgProv = const AssetImage('assets/add_img_alt.png');
+  List<Category> categories = [select];  
   List<TextEditingController> texts = List.generate(2,(i)=>TextEditingController());
 
   @override
   void initState() {
-    idProd = widget.prod;
-    product = null;
-    img = null;
+    idProd = widget.prodId;
     super.initState();
     loadFields();
   }
@@ -56,6 +63,7 @@ class ProdMenuState extends State<ProdMenu>{
                         CircleAvatar(
                         radius: 60,
                         backgroundImage:  imgProv,
+                        backgroundColor: Colors.blueAccent,
                         child: Material(
                           shape: const CircleBorder(),
                           clipBehavior: Clip.hardEdge,
@@ -75,15 +83,13 @@ class ProdMenuState extends State<ProdMenu>{
 
                         InputData('ID: $idProd', null, false),
                         InputData("Nombre del producto:", texts[0], true),
-                        InputDropdown(null, (val) => setState(() {
+                        InputDropdown(selectedCat, loaded, (val) => setState(() {
                                 // category = val;
-                            }),const []
-                            /*categories.map((String value) =>
-                                DropdownMenuItem(
-                                    value: value,
-                                    child: Text(value)
-                                )
-                            ).toList()*/
+                                if(val != null){
+                                    selectedCat = val;
+                                }
+                            }) , categories.map((e)=> DropdownMenuItem(
+                              value: e, child: Text(e.category))).toList()
                         ),
                         InputNumeric("Precio de venta:", texts[1], false),
                         CustomButton("Guardar", Colors.blueAccent, 300, 50, saveProduct)
@@ -96,16 +102,25 @@ class ProdMenuState extends State<ProdMenu>{
   }
 
 
-  void loadFields(){
-    Product? prod = product;
+  void loadFields() async{
+
+    Product? prod = widget.product;
+
     if(prod != null){
+      
       var url = prod.url;
       texts[0].text = prod.name;
-      texts[1].text = prod.price as String;
+      texts[1].text = '${prod.price}';
+
       if(url != null){
         imgProv = NetworkImage(url);
       }
     }
+
+    //cargar categorias..
+    var cats = await HttpMan.getCategories();
+    categories.addAll(cats);
+    setState(() => loaded = true);
   }
 
 
@@ -122,9 +137,10 @@ class ProdMenuState extends State<ProdMenu>{
   void saveProduct() async {
 
         var name = texts[0].text.trim();
-        var price = double.tryParse(texts[1].text) ?? 0;
-        var imgUrl = product?.url;
+        var price = num.tryParse(texts[1].text) ?? 0;
+        var imgUrl = widget.product?.url;
         var imgFile = img;
+        var catid = selectedCat.id;
 
         if(name.isEmpty || price < 0){
             Util.showAlert(context, 'Verifica los datos ingresados por favor');
@@ -135,8 +151,28 @@ class ProdMenuState extends State<ProdMenu>{
         if(imgFile != null){
             imgUrl = await ApiUtil.uploadImage(imgFile);
         }
+
+        var resp = await HttpMan.insert_product(
+          idProd, name, imgUrl, price, catid
+        );
+
         Util.popDialog(context);
         FocusManager.instance.primaryFocus?.unfocus();
+
+        if(resp != null){
+          var message = resp["response"];
+          var genid = resp["gen_id"];
+
+          if(message != 'OK'){
+              Util.showAlert(context, message);
+          }else{
+              Util.showSnack(context, 'Guardado exitoso...');
+          }
+
+          if(genid != null){
+              setState(() => idProd = genid);
+          }
+        }
   }
 }
 

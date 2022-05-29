@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:inventario/data/category.dart';
 
+import '../../util/http-man.dart';
 import '../../../ui/widgets/common.dart';
 import '../../../util/util.dart';
 
 
 class CatMenu extends StatefulWidget{
   final int catId;
-  const CatMenu(this.catId, {Key? key}) : super(key: key);
+  final Category? category;
+
+  const CatMenu(this.catId,this.category, {Key? key}) : super(key: key);
 
   @override
   CatMenuState createState() => CatMenuState();
@@ -14,14 +18,13 @@ class CatMenu extends StatefulWidget{
 
 class CatMenuState extends State<CatMenu>{
   int catId = -1;
-  List<TextEditingController> texts = List.generate(
-      3, (i) => TextEditingController()
-  );
+  TextEditingController text = TextEditingController();
 
   @override
   void initState() {
     catId = widget.catId;
     super.initState();
+    loadFields();
   }
 
   @override
@@ -45,7 +48,7 @@ class CatMenuState extends State<CatMenu>{
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 InputData('ID: $catId', null, false),
-                InputData("Nombre de la categoria:", texts[0], true),
+                InputData("Nombre de la categoria:", text, true),
                 CustomButton("Guardar", Colors.blueAccent, 300, 50, saveCat)
               ],
             ),
@@ -58,8 +61,7 @@ class CatMenuState extends State<CatMenu>{
 
   void deleteCat(){
     if(catId == -1){
-      cleanText();
-      Util.showSnack(context, 'Campos limpiados');
+      text.clear();
       return;
     }
     Util.showLoading(context, 'Eliminando producto...');
@@ -68,14 +70,42 @@ class CatMenuState extends State<CatMenu>{
 
 
   void saveCat() async {
+
+    String cat = text.text;
+
+    if(cat.isEmpty){
+      Util.showAlert(context, "Por favor verifica los campos");
+      return;
+    }
+
     Util.showLoading(context, 'Guardando producto...');
+
+    var resp = await HttpMan.insert_category(catId, cat);
+
     Util.popDialog(context);
     FocusManager.instance.primaryFocus?.unfocus();
+
+    if(resp != null){
+        var message = resp["response"];
+        var genid = resp["gen_id"];
+
+        if(message != 'OK'){
+            Util.showAlert(context, message);
+        }else{
+            Util.showSnack(context, 'Guardado exitoso...');
+        }
+
+        if(genid != null){
+            setState(() => catId = genid);
+        }
+      }
   }
 
-  void cleanText(){
-      for(var element in texts){
-          element.clear();
-      }
+
+  void loadFields() {
+    var cat = widget.category;
+    if(cat != null){
+        text.text = cat.category;
+    }
   }
 }

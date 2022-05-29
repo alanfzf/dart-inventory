@@ -11,3 +11,47 @@ Content-Type: application/json
     "username": "alan",
     "password": "alan123"
 }
+
+###
+GET {{API}}/get_suppliers
+
+###
+GET {{API}}/get_categories
+
+###
+GET {{API}}/get_products
+
+
+###
+POST  {{API}}/upsert_category
+Content-Type: application/json
+
+{
+    "id_category": -1,
+    "category": "test4"
+}
+###
+POST  {{API}}/upsert_product
+Content-Type: application/json
+
+{
+    "prod_id": 3,
+    "prod": "test3",
+    "image": null,
+    "price": 3.50,
+    "category": 1
+}
+
+###
+POST  {{API}}/upsert_supplier
+Content-Type: application/json
+
+{
+    "sup_id": 3,
+    "sup_name": "CocaCola",
+    "sup_nit": "1402730-5",
+    "rep_name": "pedro",
+    "rep_surname": "ponce",
+    "rep_phone": "40203001",
+    "rep_mail": "pedrop@cocacola.com"
+}

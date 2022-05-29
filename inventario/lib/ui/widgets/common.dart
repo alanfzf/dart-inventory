@@ -33,13 +33,38 @@ class SearchWidget extends StatelessWidget{
   }
 }
 
+class LoadingScreen extends StatelessWidget{
+
+  const LoadingScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  SizedBox(
+                      width: 70,
+                      height: 70,
+                      child: CircularProgressIndicator(color: Colors.blue)
+                  ),
+                ],
+            ),
+          );
+  }
+
+}
+
+
 class InputDropdown extends StatelessWidget{
 
-  final List<DropdownMenuItem<String>> items;
-  final String? selected;
-  final ValueChanged<String?> onChange;
+  final List<DropdownMenuItem<dynamic>> items;
+  final dynamic selected;
+  final ValueChanged<dynamic> onChange;
+  final bool enabled;
 
-  const InputDropdown(this.selected, this.onChange,
+  const InputDropdown(this.selected,this.enabled, this.onChange,
       this.items, {Key? key}) : super(key: key);
 
 
@@ -59,7 +84,7 @@ class InputDropdown extends StatelessWidget{
                 isExpanded: true,
                 enableFeedback: true,
                 items: items,
-                onChanged: onChange,
+                onChanged: enabled ? onChange : null,
             )),
         ));
   }

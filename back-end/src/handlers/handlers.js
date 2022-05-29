@@ -1,4 +1,14 @@
-const {makeBackup, callLogin} = require('../database/db-man');
+const {
+    makeBackup, callLogin,
+    reqCategories, reqProducts,
+    reqSuppliers,
+    updateCategory,
+    updateSupplier,
+    updateProduct,
+    createCategory,
+    createSupplier,
+    createProduct,
+} = require('../database/db-man');
 
 
 const backupHandler = async (req, res) =>{
@@ -19,7 +29,79 @@ const loginHandler = async (req, res) =>{
 }
 
 
+const getSuppliers  = async (req, res) =>{
+    const resp = await reqSuppliers();
+    res.json(resp);
+}
+
+const getProducts  = async (req, res) =>{
+    const resp = await reqProducts();
+    res.json(resp);
+}
+
+const getCategories  = async (req, res) =>{
+    const resp = await reqCategories();
+    res.json(resp);
+}
+
+
+//create
+const insertCategory= async (req, res) => {
+    const {id_category, category} = req.body;
+    let resp;
+
+    if(id_category === -1){
+        resp = await createCategory(category);
+    }else{
+        resp = await updateCategory(id_category, category);
+    }
+
+    res.json(resp);
+}
+
+const insertSupplier = async (req, res) => {
+    const {sup_id, sup_name, sup_nit, rep_name, 
+        rep_surname, rep_phone, rep_mail
+    } = req.body;
+
+    let resp;
+
+    if(sup_id === -1){
+        resp = await createSupplier(sup_name, sup_nit, 
+            rep_name, rep_surname, rep_phone, rep_mail
+        );
+    }else{
+        resp = await updateSupplier(sup_id, sup_name, sup_nit, 
+            rep_name, rep_surname, rep_phone, rep_mail
+        );
+    }
+
+    res.json(resp);
+}
+
+const insertProduct = async (req, res) => {
+    const {prod_id, prod, image, price, category
+    } = req.body;
+
+    let resp;
+
+    if(prod_id === -1){
+         resp = await createProduct(prod, image, price, category);
+    }else{
+        resp = await updateProduct(prod_id, prod, image, price, category)
+    }
+
+    res.json(resp);
+}
+
+
 module.exports = {
     backupHandler,
     loginHandler,
+    getSuppliers,
+    getCategories,
+    getProducts,
+
+    insertCategory,insertProduct,
+    insertSupplier,
 }

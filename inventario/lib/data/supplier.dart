@@ -1,12 +1,12 @@
 class Supplier{
 
-  int id;
-  String provider;
-  String name, lastname;
-  String email, phone, nit;
+  final int id;
+  final String name;
+  final String repName, repLast;
+  final String email, phone, nit;
 
   Supplier(
-      this.id, this.provider, this.name, this.lastname,
+      this.id, this.name, this.repName, this.repLast,
       this.email, this.phone, this.nit
   );
 }
