@@ -32,7 +32,23 @@ async function callLogin(user, pass){
     return resp.recordset;
 }
 
+async function callOlap(){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    const resp = await req.query('select * from dbo.olap_movimientos()');
+    await conn.close();
+    return resp.recordset;
+}
 //VISTAS
+async function getSells(){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    const resp = await req.query('select * from dbo.ventas_por_dia');
+    await conn.close();
+    return resp.recordset;
+}
+
+//vistas
 async function reqCategories(){
 
     const conn = await getConnection();
@@ -64,6 +80,21 @@ async function reqProducts(){
     return resp.recordset;
 }
 
+async function reportProducts(){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    const resp = await req.query('select * from dbo.existencias_productos');
+    await conn.close();
+    return resp.recordset;
+}
+
+async function  reportCategories(){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    const resp = await req.query('select * from dbo.productos_en_categoria');
+    await conn.close();
+    return resp.recordset;
+}
 //PROCEDIMIENTOS.
 async function makeBackup(){
     const conn = await getConnection();
@@ -191,7 +222,7 @@ function gen_response(log, id){
 
 
 module.exports = {
-    makeBackup, callLogin,
+    makeBackup, callLogin, callOlap,
     reqCategories, reqSuppliers,
     reqProducts, 
     
@@ -199,4 +230,8 @@ module.exports = {
     updateProduct, createProduct,
     updateSupplier, createSupplier,
 
+
+    reportProducts, reportCategories,
+
+    getSells,
 };

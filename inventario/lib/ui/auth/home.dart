@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventario/data/user.dart';
+import 'package:inventario/ui/reports/graphs.dart';
 
 import '../../util/util.dart';
 import 'login.dart';
@@ -12,6 +13,9 @@ import '../categories/menu-category.dart';
 
 import '../suppliers/supplier-list.dart';
 import '../suppliers/menu-suppliers.dart';
+
+import '../reports/reports.dart';
+import '../reports/movements.dart';
 
 
 class Home extends StatefulWidget{
@@ -107,11 +111,21 @@ class HomeState extends State<Home>{
               Wrap(
                 spacing: 25,
                 runSpacing: 30,
-                children: const [
-                  TileMain("Movimientos", Icons.attach_money),
-                  TileMain("Reportes", Icons.analytics),
-                  TileMain("Bitacora", Icons.wysiwyg),
-                  TileMain("Acerca de", Icons.help),
+                children: [
+                  TileMain("Movimientos", Icons.attach_money, 
+                    ()=>  Util.redirect(context, const MovementsMenu())
+                  ),
+
+                  TileMain("Reportes", Icons.analytics, 
+                      ()=> Util.redirect(context, const ReportsMenu())
+                  ),
+          
+                  TileMain("Graficas", Icons.bar_chart, 
+                    ()=> Util.redirect(context, const GraphsMenu())
+                  ),
+
+                  TileMain("Bitacora", Icons.wysiwyg, (){}),
+                  TileMain("Acerca de", Icons.help, (){}),
                 ])
             ])
     );
@@ -124,13 +138,14 @@ class TileMain extends StatelessWidget{
 
   final String text;
   final IconData icon;
+  final VoidCallback action;
 
-  const TileMain(this.text, this.icon, {Key? key}) : super(key: key);
+  const TileMain(this.text, this.icon, this.action, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){},
+      onTap: action,
       child: Ink(
         height: 160,
         width: 160,

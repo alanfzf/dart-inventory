@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:inventario/config-man.dart';
 import 'package:inventario/data/category.dart';
+import 'package:inventario/data/olap.dart';
 import 'package:inventario/data/product.dart';
+import 'package:inventario/data/report.dart';
+import 'package:inventario/data/sell.dart';
 import 'package:inventario/data/supplier.dart';
 import 'package:inventario/data/user.dart';
 
@@ -190,4 +193,98 @@ class HttpMan {
     return reqResp;
   }
 
+
+  static Future<List<Report>> reportProducts() async{
+      List<Report> reportes = [];
+
+      try{
+        var resp = await http.get(Config.getAPIurl('/report_products'));
+        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+
+        if(json==null || json.length == 0){
+            return reportes;
+        }
+
+        for(var el in json){
+            reportes.add(Report(el["id_product"], el["prod_name"], el["existencias"]));
+        }
+
+      }catch(err){      }
+
+      return reportes;
+  } 
+
+static Future<List<Report>> reportCategories() async{
+      List<Report> reportes = [];
+
+      try{
+        var resp = await http.get(Config.getAPIurl('/report_categories'));
+        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+
+        if(json==null || json.length == 0){
+            return reportes;
+        }
+
+        for(var el in json){
+            reportes.add(Report(el["id"], el["categoria"], el["cantidad"]));
+        }
+
+      }catch(err){      }
+
+      return reportes;
+  } 
+
+
+  static Future<List<Olap>> olapMovements() async{
+        List<Olap> olap = [];
+
+        try{
+          var resp = await http.get(Config.getAPIurl('/get_olap'));
+          var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+
+          if(json==null || json.length == 0){
+              return olap;
+          }
+
+          for(var el in json){
+              olap.add(Olap(el["producto"], 
+                el["categoria"], 
+                DateTime.parse(el["fecha"]), 
+                el["tipo"], 
+                el["cantidad"], 
+                el["total"]
+              ));
+          }
+
+        }catch(err){     print(err); }
+
+        return olap;
+    } 
+
+
+
+ static Future<List<Sell>> sellsByDay() async{
+        List<Sell> sells = [];
+
+        try{
+          var resp = await http.get(Config.getAPIurl('/get_sells'));
+          var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+
+          if(json==null || json.length == 0){
+              return sells;
+          }
+
+          for(var el in json){
+              sells.add(Sell(
+                  DateTime.parse(el["fecha"]), 
+                  el["tipo"], 
+                  el["cantidad"], 
+                  el["total"]
+              ));
+          }
+
+        }catch(err){     print(err); }
+
+        return sells;
+    } 
 }

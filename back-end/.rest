@@ -16,10 +16,21 @@ Content-Type: application/json
 GET {{API}}/get_suppliers
 
 ###
+GET {{API}}/report_products
+
+###
+GET {{API}}/report_categories
+###
 GET {{API}}/get_categories
 
 ###
 GET {{API}}/get_products
+
+###
+GET {{API}}/get_olap
+
+###
+GET {{API}}/get_sells
 
 
 ###

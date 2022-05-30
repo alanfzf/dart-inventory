@@ -8,8 +8,17 @@ const {
     createCategory,
     createSupplier,
     createProduct,
+    reportProducts,
+    reportCategories,
+    callOlap,
+    getSells,
 } = require('../database/db-man');
 
+
+const requestSells = async (req,res) =>{
+    const resp = await getSells();
+    res.json(resp);
+}
 
 const backupHandler = async (req, res) =>{
     const resp = await makeBackup();
@@ -28,6 +37,20 @@ const loginHandler = async (req, res) =>{
     res.json(resp);
 }
 
+const getOlap = async (req, res)=>{
+    const resp = await callOlap();
+    res.json(resp);
+}
+
+const getReportProducts = async (req, res)=>{
+    const resp = await reportProducts();
+    res.json(resp);
+}
+
+const getReportCategories = async (req, res)=>{
+    const resp = await reportCategories();
+    res.json(resp);
+}
 
 const getSuppliers  = async (req, res) =>{
     const resp = await reqSuppliers();
@@ -104,4 +127,7 @@ module.exports = {
 
     insertCategory,insertProduct,
     insertSupplier,
+
+    getReportCategories, getReportProducts,
+    getOlap, requestSells
 }

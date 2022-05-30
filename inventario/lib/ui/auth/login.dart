@@ -31,7 +31,7 @@ class LoginState extends State<Login> {
             const Center(
               child: CircleAvatar(
                 radius: 75.0,
-                backgroundImage: AssetImage('assets/add_img.png'),
+                backgroundImage: AssetImage('assets/add_img_alt.png'),
               ),
             ),
             const SizedBox(width: 300, height: 10),
@@ -41,8 +41,8 @@ class LoginState extends State<Login> {
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
                 )),
-            InputData("Ingresa tu usuario", user, false),
-            InputData("Ingresa tu clave", pass, true),
+            LineInput("Ingresa tu usuario", user, false),
+            LineInput("Ingresa tu clave", pass, true),
             CustomButton("Acceder", Colors.blueAccent, 300, 50, doLogin),
           ],
         ),
@@ -69,30 +69,4 @@ class LoginState extends State<Login> {
   }
 }
 
-class InputData extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final bool pass;
 
-  const InputData(this.hint, this.controller, this.pass, {Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 70,
-        width: 350,
-        child: TextField(
-            obscureText: pass,
-            controller: controller,
-            decoration: InputDecoration(
-              hintStyle: TextStyle(color: Colors.grey.shade400),
-              hintText: hint,
-              enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade300)),
-            )
-        ));
-  }
-}

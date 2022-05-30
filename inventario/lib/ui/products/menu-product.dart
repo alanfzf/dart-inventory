@@ -104,10 +104,11 @@ class ProdMenuState extends State<ProdMenu>{
 
   void loadFields() async{
 
-    Product? prod = widget.product;
+    var prod = widget.product;
+    var cats = await HttpMan.getCategories();
+    categories.addAll(cats);
 
     if(prod != null){
-      
       var url = prod.url;
       texts[0].text = prod.name;
       texts[1].text = '${prod.price}';
@@ -115,11 +116,13 @@ class ProdMenuState extends State<ProdMenu>{
       if(url != null){
         imgProv = NetworkImage(url);
       }
+      var prodCat = categories.firstWhere(
+        (e) => e.category == prod.category, 
+        orElse: ()=>select
+      );
+      selectedCat = prodCat;
     }
-
-    //cargar categorias..
-    var cats = await HttpMan.getCategories();
-    categories.addAll(cats);
+    //cargar la pagina.
     setState(() => loaded = true);
   }
 

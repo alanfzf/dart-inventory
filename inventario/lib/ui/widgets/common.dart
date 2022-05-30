@@ -209,3 +209,79 @@ class InputNumeric extends StatelessWidget{
   }
 }
 
+
+class LineInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool pass;
+
+  const LineInput(this.hint, this.controller, this.pass, {Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 70,
+        width: 350,
+        child: TextField(
+            obscureText: pass,
+            controller: controller,
+            decoration: InputDecoration(
+              hintStyle: TextStyle(color: Colors.grey.shade400),
+              hintText: hint,
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade300)),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade300)),
+            )
+        ));
+  }
+}
+
+
+class CustomTable extends StatelessWidget{
+
+  final List<String> columns;
+  final List<DataRow> rows;
+  final double spacing;
+
+  const CustomTable(this.columns, this.spacing, this.rows, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      border: TableBorder.all(style: BorderStyle.solid, color: Colors.transparent),
+      headingRowColor: MaterialStateProperty.resolveWith((s) => 
+      const Color.fromARGB(255, 245, 245, 245)),
+      columnSpacing: spacing,
+      columns: columns.map((e) {
+        return DataColumn(
+          label: Text(e, style: const TextStyle(
+          fontSize: 16, 
+          fontWeight: FontWeight.bold,
+          ))
+        );
+      }).toList(), 
+      rows: rows
+    );
+  }
+}
+
+
+DataRow createRow(List<String> cellList){
+    return DataRow(color: MaterialStateColor.resolveWith(
+      (s) => const Color.fromARGB(255, 240, 240, 240))
+      ,cells: cellList.map((e){
+        return DataCell(Center(child: Text(e)));
+    }).toList()
+  );
+}
+
+Text createTitle(String text){
+   return Text(text, 
+      style: const TextStyle(
+      color: Colors.blueAccent,
+      fontSize: 20, fontWeight: FontWeight.bold, 
+      // fontStyle: FontStyle.italic,
+     ));
+}
