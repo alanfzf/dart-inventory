@@ -5,6 +5,11 @@ class Util {
   
   Util._();
 
+
+  static returnToMenu(BuildContext context){
+      Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   static void showSnack(BuildContext ctx, String txt) =>
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
           content: Text(txt), duration: const Duration(milliseconds: 1000)));
@@ -34,9 +39,9 @@ class Util {
             title: const Text('Alerta'),
             content: Text(msg),
             actions: [
-              TextButton(
-                  onPressed: () => popDialog(ctx), child: const Text('Ok'))
-            ],
+              TextButton(onPressed: 
+              () => popDialog(ctx), child: const Text('Ok')
+              )],
           );
         });
   }

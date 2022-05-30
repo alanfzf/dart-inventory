@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventario/data/user.dart';
 import 'package:inventario/ui/reports/graphs.dart';
+import 'package:inventario/util/http-man.dart';
 
 import '../../util/util.dart';
 import 'login.dart';
@@ -78,7 +79,19 @@ class HomeState extends State<Home>{
 
               //otras opcioens
               divider,
-              TileMenu(Icons.settings, "Opciones", () { }),
+              TileMenu(Icons.restore, "Generar backup", () async{
+                  var op = await Util.showNoYesDialog(context, 
+                  "Deseas generar el backup?"
+                  );
+                  if(op){
+                    Util.showLoading(context, "Generando backup....");
+                    var resp = await HttpMan.performBackup();
+                    Util.popDialog(context);
+                    Util.popDialog(context);
+                    Util.showSnack(context, resp);
+                  }
+
+               }),
               TileMenu(Icons.logout, "Cerrar sesión",
                       () => Util.redirect(context, const Login()))
             ],
@@ -125,7 +138,12 @@ class HomeState extends State<Home>{
                   ),
 
                   TileMain("Bitacora", Icons.wysiwyg, (){}),
-                  TileMain("Acerca de", Icons.help, (){}),
+                  TileMain("Acerca de", Icons.help, 
+                  ()=> Util.showAlert(context, 
+                      "Nombre: Alan David González López\n" 
+                      "Carné: 4090-19-4713\n"
+                      "Curso: Base de datos II"
+                  )),
                 ])
             ])
     );

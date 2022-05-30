@@ -31,7 +31,10 @@ class MovementsMenuState extends State<MovementsMenu>{
     final DateFormat formatter = DateFormat('dd-MM-yyyy');
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.blueAccent),
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        title: const Text("Movimientos"),
+      ),
       body: loaded ? SingleChildScrollView(
         reverse: true,
         primary: false,

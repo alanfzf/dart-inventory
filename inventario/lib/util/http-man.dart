@@ -12,41 +12,96 @@ import 'package:inventario/data/user.dart';
 
 class HttpMan {
 
-  HttpMan._();
+    HttpMan._();
 
-  static Future<User?> performLogin(String user, String pass) async {
+    static Future<dynamic> _createDeleteRequest(String endpoint, Map<String, dynamic> body) async{
+        dynamic reqResp;
+        try{
+          var resp = await http.delete(Config.getAPIurl(endpoint),      
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: jsonEncode(body)
+            );  
+            var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+            if(json == null || json.length == 0){
+                return null;
+            }
+            reqResp = json;
+        }catch(err){
+            print(err);
+        }
+        return reqResp;
+    }
 
-    try{
-      var resp = await http.post(Config.getAPIurl('/login'),
-        body: {"username": user, "password": pass});
+    static Future<dynamic> _createPostRequest(String endpoint, Map<String, dynamic> body) async{
+          dynamic reqResp;
+          try{
+              var resp = await http.post(Config.getAPIurl(endpoint), 
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: jsonEncode(body)
+              );
+              var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+              if(json == null || json.length == 0){
+                  return null;
+              }
+              reqResp = json;
 
-      var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+          }catch(err){
+              print(err);
+          }
+          
+          return reqResp;
+    }
 
-      if(json == null || json.length == 0){
-          return null;
-      }
-      return User(json[0]["id_staff"], json[0]["staff_login"]);
-    // ignore: empty_catches
-    }catch(err){}
-    
-    return null;
-  }
-
-  static Future<List<Product>> getProducts() async{
-
-      List<Product> products = [];
+    static Future<dynamic> _createGetRequest(String endpoint) async{
+      dynamic reqResp;
 
       try{
-        var resp = await http.get(Config.getAPIurl('/get_products'));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+            var resp = await http.get(Config.getAPIurl(endpoint));
+            var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
 
 
-        if(json==null || json.length == 0){
-            return products;
+            if(json==null || json.length == 0){
+                return null;
+            }
+            reqResp = json;
+          }catch(err){ print(err); }
+
+      return reqResp;
+    }
+
+  //CALLS.
+    static Future<User?> performLogin(String user, String pass) async {
+        var login = await _createPostRequest('/login', {
+            "username": user,
+            "password": pass,
+        });
+
+        if(login==null){
+            return null;
         }
 
-        for (var val in json) {
+        return User(login[0]["id_staff"], login[0]["staff_login"]);
+    }
 
+    static Future<String> performBackup() async {
+        var resp = await _createPostRequest('/backup', {});
+        if(resp == null){
+            return "ERROR";
+        }
+        return resp["log"];
+    }
+
+    static Future<List<Product>> getProducts() async {
+        final List<Product> products = [];
+        var resp = await _createGetRequest('/get_products');
+        if(resp == null){
+            return products;
+        }
+        for (var val in resp) {
             products.add(Product(
                 val["id_product"], 
                 val["prod_name"], 
@@ -54,199 +109,125 @@ class HttpMan {
                 val["prod_image"], 
                 val["prod_price"]
             ));
-        }
-      }catch(err){      }
+          }
+        return products;
+    }
 
-      return products;
-  } 
-
-  static Future<List<Category>> getCategories() async{
-     
-      List<Category> categories = [];
-
-      try{
-        var resp = await http.get(Config.getAPIurl('/get_categories'));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-
-        if(json==null || json.length == 0){
+    static Future<List<Category>> getCategories() async {
+        final List<Category> categories = [];
+        var resp = await _createGetRequest('/get_categories');
+        if(resp == null){
             return categories;
         }
-
-        for (var val in json) {
+        for (var val in resp) {
             categories.add(Category(
-              val["id_category"],
-              val["categ_name"]
-             ));
-        }
-      }catch(err){}
+                val["id_category"],
+                val["categ_name"]
+            ));
+          }
+        return categories;
+    }
 
-      return categories;
-  }
-
-  static Future<List<Supplier>> getSuppliers() async {
-      
-      List<Supplier> suppliers = [];
-
-      try{
-        var resp = await http.get(Config.getAPIurl('/get_suppliers'));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-
-        if(json==null || json.length == 0){
+    static Future<List<Supplier>> getSuppliers() async {
+        final List<Supplier> suppliers = [];
+        var resp = await _createGetRequest('/get_suppliers');
+        if(resp == null){
             return suppliers;
         }
-
-        for (var val in json) {
-            suppliers.add(Supplier(
-                val["id_supplier"], 
-                val["sup_name"],
-                val["person_name"], 
-                val["person_lastname"], 
-                val["email"],
-                val["phone"], 
-                val["sup_nit"]
+        for (var val in resp) {
+              suppliers.add(Supplier(
+                  val["id_supplier"], 
+                  val["sup_name"],
+                  val["person_name"], 
+                  val["person_lastname"], 
+                  val["email"],
+                  val["phone"], 
+                  val["sup_nit"]
               ));
-        }
-      }catch(err){}
+          }
+        return suppliers;
+    }
 
-      return suppliers;
-  }
+    static Future<dynamic> insertProduct(int id, String prod, String? image, 
+        num price, int category) async{
 
+        var resp = _createPostRequest('/upsert_product',{
+              "prod_id": id, 
+              "prod": prod,
+              "image": image,
+              "price": price,
+              "category": category
+        });
+        return resp;
+    }
 
-  static Future<dynamic> insert_product(int id, String prod, String? image, num price, int category) async{
-      var reqResp;
+    static Future<dynamic> insertCategory(int id, String cat) async{
+        var resp = _createPostRequest('/upsert_category',{
+              "id_category": id, 
+              "category": cat,
+        });
 
-      try{
-        var resp = await http.post(Config.getAPIurl('/upsert_product'),
-            headers: {
-                "content-type": "application/json"
-            },
-            body: jsonEncode({
-            "prod_id": id, 
-            "prod": prod,
-            "image": image,
-            "price": price,
-            "category": category
-          }));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-    
-        if(json == null || json.length == 0){
-            return null;
-        }
-        reqResp = json;
-    }catch(err){}
+        return resp;
+    }
 
-    return reqResp;
-  }
+    static Future<dynamic> insertSupplier(int id, String sup, String nit, 
+        String rep, String rep2, String phone, String mail) async{
+          
+          var resp = _createPostRequest('/upsert_supplier', {
+                "sup_id": id,
+                "sup_name": sup,
+                "sup_nit": nit,
+                "rep_name": rep,
+                "rep_surname": rep2,
+                "rep_phone": phone,
+                "rep_mail": mail,
+          });
 
-    static Future<dynamic> insert_category(int id, String cat) async{
+        return resp;
+    }
 
-      var reqResp;
+    static Future<List<Report>> reportProducts() async{
+        List<Report> reportes = [];
 
-      try{
-        var resp = await http.post(Config.getAPIurl('/upsert_category'),
-          headers: {
-            "content-type": "application/json"
-          },
-          body: jsonEncode({
-            "id_category": id, 
-            "category": cat,
-          }));
-
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-      
-        if(json == null || json.length == 0){
-            return null;
-        }
-        reqResp = json;
-    }catch(err){}
-    return reqResp;
-  }
-
-  static Future<dynamic> insert_supplier(int id, String sup, String nit, String rep, String rep2, String phone, String mail) async{
-
-      var reqResp;
-
-      try{
-        var resp = await http.post(Config.getAPIurl('/upsert_supplier'),
-          headers: {
-            "content-type": "application/json"
-          },
-          body: jsonEncode({
-              "sup_id": id,
-              "sup_name": sup,
-              "sup_nit": nit,
-              "rep_name": rep,
-              "rep_surname": rep2,
-              "rep_phone": phone,
-              "rep_mail": mail,
-          }));
-
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-      
-        if(json == null || json.length == 0){
-            return null;
-        }
-        reqResp = json;
-
-    }catch(err){}
-
-    return reqResp;
-  }
-
-
-  static Future<List<Report>> reportProducts() async{
-      List<Report> reportes = [];
-
-      try{
-        var resp = await http.get(Config.getAPIurl('/report_products'));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-
-        if(json==null || json.length == 0){
+        var resp = await _createGetRequest('/report_products');
+        
+        if(resp == null){
             return reportes;
         }
 
-        for(var el in json){
+        for(var el in resp){
             reportes.add(Report(el["id_product"], el["prod_name"], el["existencias"]));
         }
 
-      }catch(err){      }
+        return reportes;
+    } 
 
-      return reportes;
-  } 
+    static Future<List<Report>> reportCategories() async{
+        List<Report> reportes = [];
 
-static Future<List<Report>> reportCategories() async{
-      List<Report> reportes = [];
+        var resp = await _createGetRequest('/report_categories');
 
-      try{
-        var resp = await http.get(Config.getAPIurl('/report_categories'));
-        var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-
-        if(json==null || json.length == 0){
+        if(resp == null){
             return reportes;
         }
 
-        for(var el in json){
-            reportes.add(Report(el["id"], el["categoria"], el["cantidad"]));
+        for(var el in resp){
+              reportes.add(Report(el["id"], el["categoria"], el["cantidad"]));
         }
 
-      }catch(err){      }
+        return reportes;
+    } 
 
-      return reportes;
-  } 
-
-
-  static Future<List<Olap>> olapMovements() async{
+    static Future<List<Olap>> olapMovements() async{
         List<Olap> olap = [];
 
-        try{
-          var resp = await http.get(Config.getAPIurl('/get_olap'));
-          var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
+        var resp = await _createGetRequest('/get_olap');
 
-          if(json==null || json.length == 0){
-              return olap;
-          }
+        if(resp == null){
+            return olap;
+        }
 
-          for(var el in json){
+        for(var el in resp){
               olap.add(Olap(el["producto"], 
                 el["categoria"], 
                 DateTime.parse(el["fecha"]), 
@@ -256,35 +237,38 @@ static Future<List<Report>> reportCategories() async{
               ));
           }
 
-        }catch(err){     print(err); }
-
         return olap;
-    } 
+   } 
 
-
-
- static Future<List<Sell>> sellsByDay() async{
+  static Future<List<Sell>> sellsByDay() async{
         List<Sell> sells = [];
-
-        try{
-          var resp = await http.get(Config.getAPIurl('/get_sells'));
-          var json = resp.statusCode == 200 ? jsonDecode(resp.body) : null;
-
-          if(json==null || json.length == 0){
-              return sells;
-          }
-
-          for(var el in json){
+        var resp = await _createGetRequest('/get_sells');
+        if(resp == null){
+            return sells;
+        }
+        for(var el in resp){
               sells.add(Sell(
                   DateTime.parse(el["fecha"]), 
                   el["tipo"], 
                   el["cantidad"], 
                   el["total"]
               ));
-          }
-
-        }catch(err){     print(err); }
-
+        }
         return sells;
-    } 
-}
+    }
+
+    static Future<void> deleteCategory(int catId) async{
+        var resp = await _createDeleteRequest('/delete_category', 
+        {"category_id": catId});
+    }
+
+    static Future<void> deleteProduct(int product) async{
+        var resp = await _createDeleteRequest('/delete_product', 
+        {"product_id": product});
+    }
+
+    static Future<void> deleteSupplier(int idSupp) async{
+        var resp = await _createDeleteRequest('/delete_supplier', 
+        {"supplier_id": idSupp});
+    }
+  }

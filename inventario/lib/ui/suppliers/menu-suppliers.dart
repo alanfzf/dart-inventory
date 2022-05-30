@@ -65,13 +65,16 @@ class SupMenuState extends State<SupMenu>{
   }
 
 
-  void deleteSupplier(){
-    if(idProv == -1){
-      cleanText();
-      Util.showSnack(context, 'Campos limpiados');
-      return;
-    }
-     Util.showLoading(context, 'Eliminando producto...');
+  void deleteSupplier() async{
+      if(idProv == -1){
+        cleanText();
+        Util.showSnack(context, 'Campos limpiados');
+        return;
+      }
+      Util.showLoading(context, 'Eliminando proveedor...');
+      await HttpMan.deleteSupplier(idProv);
+      Util.popDialog(context);
+      Util.returnToMenu(context);
   }
 
 
@@ -81,7 +84,7 @@ class SupMenuState extends State<SupMenu>{
           return;
       }
       Util.showLoading(context, 'Guardando producto...');
-      var resp = await HttpMan.insert_supplier(idProv, 
+      var resp = await HttpMan.insertSupplier(idProv, 
           texts[0].text, //nombre
           texts[1].text, //nit
           texts[2].text, texts[3].text, //representante

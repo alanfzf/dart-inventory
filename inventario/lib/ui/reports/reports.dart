@@ -30,7 +30,10 @@ class ReportsMenuState extends State<ReportsMenu>{
     const spacer = SizedBox(height: 20);
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.blueAccent),
+      appBar: AppBar(
+          backgroundColor: Colors.blueAccent,
+          title: const Text("Reportes"),
+        ),
       body: loaded ? SingleChildScrollView(
         primary: false,
         child: Padding(

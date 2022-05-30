@@ -59,32 +59,28 @@ class CatMenuState extends State<CatMenu>{
   }
 
 
-  void deleteCat(){
+  void deleteCat() async{
     if(catId == -1){
       text.clear();
       return;
     }
-    Util.showLoading(context, 'Eliminando producto...');
+    Util.showLoading(context, 'Eliminando categoría...');
+    await HttpMan.deleteCategory(catId);
     Util.popDialog(context);
+    Util.returnToMenu(context);
   }
 
 
   void saveCat() async {
-
     String cat = text.text;
-
     if(cat.isEmpty){
       Util.showAlert(context, "Por favor verifica los campos");
       return;
     }
-
     Util.showLoading(context, 'Guardando producto...');
-
-    var resp = await HttpMan.insert_category(catId, cat);
-
+    var resp = await HttpMan.insertCategory(catId, cat);
     Util.popDialog(context);
     FocusManager.instance.primaryFocus?.unfocus();
-
     if(resp != null){
         var message = resp["response"];
         var genid = resp["gen_id"];

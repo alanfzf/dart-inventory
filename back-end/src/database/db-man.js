@@ -1,4 +1,3 @@
-const req = require('express/lib/request');
 const sql = require('mssql');
 const creds = {
     user: process.env.USER,
@@ -19,6 +18,36 @@ async function getConnection(){
         console.log(err);
     }
 }
+
+//delete
+async function delCategory(id_cat){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    req.input('id', sql.Int(), id_cat);
+    const resp = await req.query('delete from tb_category where id_category = @id');
+    await conn.close();
+    return resp;
+}
+
+async function delCategory(id_prod){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    req.input('id', sql.Int(), id_prod);
+    const resp = await req.query('delete from tb_product where id_product = @id');
+    await conn.close();
+    return resp;
+}
+
+async function delSupplier(id_supplier){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    req.input('supplier_id', sql.Int(), id_supplier);
+    req.output('log', sql.VarChar());
+    const resp = await req.execute('delete_supplier');
+    await conn.close();
+    return resp.output;
+}
+
 
 //FUNCIONES
 async function callLogin(user, pass){
@@ -232,6 +261,7 @@ module.exports = {
 
 
     reportProducts, reportCategories,
-
     getSells,
+
+    delCategory, delSupplier
 };

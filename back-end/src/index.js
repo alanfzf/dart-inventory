@@ -14,6 +14,9 @@ const {
     getReportCategories,
     getOlap,
     requestSells,
+    deleteCategory,
+    deleteProduct,
+    deleteSupplier,
 } = require('./handlers/handlers');
 
 
@@ -40,3 +43,7 @@ app.post('/api/upsert_product', insertProduct);
 app.post('/api/upsert_category', insertCategory);
 app.post('/api/upsert_supplier', insertSupplier);
 
+//delete
+app.delete('/api/delete_category', deleteCategory);
+app.delete('/api/delete_product', deleteProduct);
+app.delete('/api/delete_supplier', deleteSupplier);

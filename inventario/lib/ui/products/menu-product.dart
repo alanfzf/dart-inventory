@@ -127,13 +127,15 @@ class ProdMenuState extends State<ProdMenu>{
   }
 
 
-  void deleteProd(){
+  void deleteProd() async{
       if(idProd == -1){
           for (var element in texts) { element.clear(); }
           return;
       }
-      Util.showLoading(context, 'Eliminando producto...');
-      Util.popDialog(context);
+    Util.showLoading(context, 'Eliminando producto...');
+    await HttpMan.deleteProduct(idProd);
+    Util.popDialog(context);
+    Util.returnToMenu(context);
   }
 
 
@@ -155,7 +157,7 @@ class ProdMenuState extends State<ProdMenu>{
             imgUrl = await ApiUtil.uploadImage(imgFile);
         }
 
-        var resp = await HttpMan.insert_product(
+        var resp = await HttpMan.insertProduct(
           idProd, name, imgUrl, price, catid
         );
 

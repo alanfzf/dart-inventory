@@ -12,8 +12,31 @@ const {
     reportCategories,
     callOlap,
     getSells,
+    delCategory,
+    delSupplier,
 } = require('../database/db-man');
 
+
+
+const deleteCategory= async (req, res) =>{
+    const {category_id} = req.body;
+    const resp = await delCategory(category_id);
+    res.json(resp);
+}
+
+const deleteProduct = async (req, res) =>{
+    const {product_id} = req.body;
+    const resp = await delCategory(product_id);
+    res.json(resp);
+}
+
+const deleteSupplier = async (req, res) =>{
+    const {supplier_id} = req.body;
+    const resp = await delSupplier(supplier_id);
+    res.json(resp);
+}
+
+//delete
 
 const requestSells = async (req,res) =>{
     const resp = await getSells();
@@ -78,7 +101,7 @@ const insertCategory= async (req, res) => {
     }else{
         resp = await updateCategory(id_category, category);
     }
-
+    
     res.json(resp);
 }
 
@@ -129,5 +152,8 @@ module.exports = {
     insertSupplier,
 
     getReportCategories, getReportProducts,
-    getOlap, requestSells
+    getOlap, requestSells,
+
+    deleteCategory, deleteProduct,
+    deleteSupplier,
 }
