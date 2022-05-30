@@ -17,6 +17,7 @@ const {
     deleteCategory,
     deleteProduct,
     deleteSupplier,
+    getLogs,
 } = require('./handlers/handlers');
 
 
@@ -32,12 +33,11 @@ app.post('/api/login', loginHandler);
 app.get('/api/get_categories', getCategories);
 app.get('/api/get_products', getProducts);
 app.get('/api/get_suppliers', getSuppliers);
-
 app.get('/api/get_olap', getOlap);
 app.get('/api/get_sells', requestSells);
-
 app.get('/api/report_products', getReportProducts);
 app.get('/api/report_categories', getReportCategories);
+app.get('/api/get_logs', getLogs);
 //post
 app.post('/api/upsert_product', insertProduct);
 app.post('/api/upsert_category', insertCategory);

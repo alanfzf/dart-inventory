@@ -19,6 +19,14 @@ async function getConnection(){
     }
 }
 
+async function reqLogs(){
+    const conn = await getConnection();
+    const req = new sql.Request(conn);
+    const resp = await req.query('select * from tb_log');
+    await conn.close();
+    return resp.recordset;
+}
+
 //delete
 async function delCategory(id_cat){
     const conn = await getConnection();
@@ -29,7 +37,7 @@ async function delCategory(id_cat){
     return resp;
 }
 
-async function delCategory(id_prod){
+async function delProduct(id_prod){
     const conn = await getConnection();
     const req = new sql.Request(conn);
     req.input('id', sql.Int(), id_prod);
@@ -253,7 +261,7 @@ function gen_response(log, id){
 module.exports = {
     makeBackup, callLogin, callOlap,
     reqCategories, reqSuppliers,
-    reqProducts, 
+    reqProducts, reqLogs,
     
     updateCategory, createCategory,
     updateProduct, createProduct,
@@ -263,5 +271,5 @@ module.exports = {
     reportProducts, reportCategories,
     getSells,
 
-    delCategory, delSupplier
+    delCategory, delSupplier, delProduct
 };

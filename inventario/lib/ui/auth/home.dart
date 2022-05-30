@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventario/data/user.dart';
 import 'package:inventario/ui/reports/graphs.dart';
+import 'package:inventario/ui/reports/log.dart';
 import 'package:inventario/util/http-man.dart';
 
 import '../../util/util.dart';
@@ -137,7 +138,11 @@ class HomeState extends State<Home>{
                     ()=> Util.redirect(context, const GraphsMenu())
                   ),
 
-                  TileMain("Bitacora", Icons.wysiwyg, (){}),
+                  TileMain("Bitacora", Icons.wysiwyg, 
+                    ()=> Util.redirect(context, const LogMenu())
+                  ),
+
+
                   TileMain("Acerca de", Icons.help, 
                   ()=> Util.showAlert(context, 
                       "Nombre: Alan David González López\n" 

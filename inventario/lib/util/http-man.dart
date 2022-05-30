@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:inventario/config-man.dart';
 import 'package:inventario/data/category.dart';
+import 'package:inventario/data/log.dart';
 import 'package:inventario/data/olap.dart';
 import 'package:inventario/data/product.dart';
 import 'package:inventario/data/report.dart';
@@ -127,6 +128,25 @@ class HttpMan {
           }
         return categories;
     }
+
+    static Future<List<Log>> getLogs() async {
+        final List<Log> logs = [];
+        var resp = await _createGetRequest('/get_logs');
+        if(resp == null){
+            return logs;
+        }
+        for (var val in resp) {
+            logs.add(Log(
+              val["id_log"], 
+              val["log_table"], 
+              val["log_action"], 
+              val["log_user"], 
+              DateTime.parse(val["log_date"])
+            ));
+          }
+        return logs;
+    }
+
 
     static Future<List<Supplier>> getSuppliers() async {
         final List<Supplier> suppliers = [];

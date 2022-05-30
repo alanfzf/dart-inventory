@@ -35,37 +35,24 @@ class MovementsMenuState extends State<MovementsMenu>{
         backgroundColor: Colors.blueAccent,
         title: const Text("Movimientos"),
       ),
-      body: loaded ? SingleChildScrollView(
-        reverse: true,
-        primary: false,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 30, bottom: 30, left: 30, right: 30),
-            child:        
-               Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  createTitle('Movimientos:'),
-                  spacer,
-                  CustomTable(const ['Producto', 'Categoria', 'Tipo', 'Fecha', 'Cantidad', 'Total'], 15, 
-                    olaps.map((e){
-
-
-
-                        return createRow([e.prod, e.cat, e.tipo, 
-                        formatter.format(e.date.toLocal()), '${e.cantidad}', 
-                        '${e.total}']);
-                    }).toList()
-                  ),
-                ]),
-          ),
-        ),
-      ) : const LoadingScreen(),
+        body:  loaded ? SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: 
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: CustomTable(
+                    const ['Producto', 'Categoria', 'Tipo', 'Fecha', 'Cantidad', 'Total'], 
+                    25, olaps.map((e){
+                         return createRow([e.prod, e.cat, e.tipo, 
+                          formatter.format(e.date.toLocal()), '${e.cantidad}', 
+                          '${e.total}']);
+                    }).toList()),
+                ),
+              )) : const LoadingScreen(),
     );
   }
-
-
 
   void loadFields() async{
       var olapMovements = await HttpMan.olapMovements();

@@ -32,6 +32,9 @@ GET {{API}}/get_olap
 ###
 GET {{API}}/get_sells
 
+###
+GET {{API}}/get_logs
+
 
 ###
 POST  {{API}}/upsert_category

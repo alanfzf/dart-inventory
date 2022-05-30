@@ -14,6 +14,8 @@ const {
     getSells,
     delCategory,
     delSupplier,
+    delProduct,
+    reqLogs,
 } = require('../database/db-man');
 
 
@@ -26,7 +28,7 @@ const deleteCategory= async (req, res) =>{
 
 const deleteProduct = async (req, res) =>{
     const {product_id} = req.body;
-    const resp = await delCategory(product_id);
+    const resp = await delProduct(product_id);
     res.json(resp);
 }
 
@@ -59,6 +61,12 @@ const loginHandler = async (req, res) =>{
     const resp = await callLogin(username, password);
     res.json(resp);
 }
+
+const getLogs = async (req, res) =>{
+    const resp = await reqLogs();
+    res.json(resp);
+}
+
 
 const getOlap = async (req, res)=>{
     const resp = await callOlap();
@@ -147,6 +155,7 @@ module.exports = {
     getSuppliers,
     getCategories,
     getProducts,
+    getLogs,
 
     insertCategory,insertProduct,
     insertSupplier,
