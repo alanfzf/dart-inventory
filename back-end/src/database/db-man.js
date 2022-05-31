@@ -51,7 +51,7 @@ async function delSupplier(id_supplier){
     const req = new sql.Request(conn);
     req.input('supplier_id', sql.Int(), id_supplier);
     req.output('log', sql.VarChar());
-    const resp = await req.execute('delete_supplier');
+    const resp = await req.execute('borrar_proveedor');
     await conn.close();
     return resp.output;
 }
@@ -72,7 +72,7 @@ async function callLogin(user, pass){
 async function callOlap(){
     const conn = await getConnection();
     const req = new sql.Request(conn);
-    const resp = await req.query('select * from dbo.olap_movimientos()');
+    const resp = await req.query('select * from dbo.olap_movimientos');
     await conn.close();
     return resp.recordset;
 }

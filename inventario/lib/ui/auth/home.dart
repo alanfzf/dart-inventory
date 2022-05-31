@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inventario/data/user.dart';
 import 'package:inventario/ui/reports/graphs.dart';
 import 'package:inventario/ui/reports/log.dart';
+import 'package:inventario/util/groups.dart';
 import 'package:inventario/util/http-man.dart';
 
 import '../../util/util.dart';
@@ -49,52 +50,53 @@ class HomeState extends State<Home>{
           child: ListView(
             scrollDirection: Axis.vertical,
             children: [
-              const DrawerHeader(
-                  decoration: BoxDecoration(color: Colors.blueAccent),
-                  child: Text("Menú principal", style:
-                  TextStyle(color: Colors.white, fontSize: 25))
+               DrawerHeader(
+                  decoration: const BoxDecoration(color: Colors.blueAccent),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    const Text("Menú principal", style:TextStyle(color: Colors.white, fontSize: 25)),
+                    Text("(Modo ${Groups.getGroupName(widget.user.group)})", style: const TextStyle(color: Colors.white, fontSize: 15)),
+                  ])
               ),
 
               //productos
-              TileMenu(Icons.archive, "Agregar producto",
-                      ()=> Util.redirect(context, const ProdMenu(-1, null))),
+              getTileMenu(Icons.archive, "Agregar producto",
+                      ()=> Util.redirect(context, const ProdMenu(-1, null)),
+                      permission: Permission.empleado),
 
-              TileMenu(Icons.search, "Buscar productos",
-                      () => Util.redirect(context, const ProdList())),
+              getTileMenu(Icons.search, "Buscar productos",
+                      () => Util.redirect(context, const ProdList()),
+                      permission: Permission.empleado),
 
               //categorias
               divider,
-              TileMenu(Icons.category, "Agregar categoria",
-                      () => Util.redirect(context, const CatMenu(-1, null))),
+              getTileMenu(Icons.category, "Agregar categoria",
+                      () => Util.redirect(context, const CatMenu(-1, null)),
+                      permission: Permission.empleado),
 
-              TileMenu(Icons.search, "Buscar categorías",
-                      () => Util.redirect(context, const CatList())),
+              getTileMenu(Icons.search, "Buscar categorías",
+                      () => Util.redirect(context, const CatList()),
+                      permission: Permission.empleado),
 
               //proveedores
               divider,
-              TileMenu(Icons.person_add, "Agregar proveedor",
-                      () => Util.redirect(context, const SupMenu(-1, null))),
+              getTileMenu(Icons.person_add, "Agregar proveedor",
+                      () => Util.redirect(context, const SupMenu(-1, null)),
+                      permission: Permission.empleado),
 
-              TileMenu(Icons.person_search_rounded, "Buscar proveedores",
-                      () => Util.redirect(context, const SupList())),
+              getTileMenu(Icons.person_search_rounded, "Buscar proveedores",
+                      () => Util.redirect(context, const SupList()), 
+                      permission: Permission.empleado),
 
               //otras opcioens
               divider,
-              TileMenu(Icons.restore, "Generar backup", () async{
-                  var op = await Util.showNoYesDialog(context, 
-                  "Deseas generar el backup?"
-                  );
-                  if(op){
-                    Util.showLoading(context, "Generando backup....");
-                    var resp = await HttpMan.performBackup();
-                    Util.popDialog(context);
-                    Util.popDialog(context);
-                    Util.showSnack(context, resp);
-                  }
-
-               }),
-              TileMenu(Icons.logout, "Cerrar sesión",
-                      () => Util.redirect(context, const Login()))
+              getTileMenu(Icons.restore, "Generar backup", generarBackup, 
+                  permission: Permission.administrador
+               ),
+              getTileMenu(Icons.logout, "Cerrar sesión",
+                  () => Util.redirect(context, const Login()))
             ],
           ),
         ),
@@ -126,24 +128,27 @@ class HomeState extends State<Home>{
                 spacing: 25,
                 runSpacing: 30,
                 children: [
-                  TileMain("Movimientos", Icons.attach_money, 
-                    ()=>  Util.redirect(context, const MovementsMenu())
+                  getTile(Icons.attach_money, "Movimientos", 
+                    ()=>  Util.redirect(context, const MovementsMenu()),
+                    permission: Permission.finanzas
                   ),
 
-                  TileMain("Reportes", Icons.analytics, 
-                      ()=> Util.redirect(context, const ReportsMenu())
+                  getTile(Icons.analytics, "Reportes", 
+                      ()=> Util.redirect(context, const ReportsMenu()),
                   ),
           
-                  TileMain("Graficas", Icons.bar_chart, 
-                    ()=> Util.redirect(context, const GraphsMenu())
+                  getTile(Icons.bar_chart, "Graficas", 
+                    ()=> Util.redirect(context, const GraphsMenu()),
+                    permission: Permission.finanzas
                   ),
 
-                  TileMain("Bitacora", Icons.wysiwyg, 
-                    ()=> Util.redirect(context, const LogMenu())
+                  getTile(Icons.wysiwyg, "Bitacora", 
+                    ()=> Util.redirect(context, const LogMenu()),
+                    permission: Permission.administrador
                   ),
 
 
-                  TileMain("Acerca de", Icons.help, 
+                  getTile(Icons.help, "Acerca de", 
                   ()=> Util.showAlert(context, 
                       "Nombre: Alan David González López\n" 
                       "Carné: 4090-19-4713\n"
@@ -154,21 +159,27 @@ class HomeState extends State<Home>{
     );
   }
 
-}
+  Future<void> generarBackup() async{
+      var op = await Util.showNoYesDialog(context, "Deseas generar el backup?");
+      if(op){
+          Util.showLoading(context, "Generando backup....");
+          var resp = await HttpMan.performBackup();
+          Util.popDialog(context);
+          Util.popDialog(context);
+          Util.showSnack(context, resp);
+      }
+  }
 
-//widgets
-class TileMain extends StatelessWidget{
-
-  final String text;
-  final IconData icon;
-  final VoidCallback action;
-
-  const TileMain(this.text, this.icon, this.action, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: action,
+  
+  InkWell getTile(IconData icon, String text, VoidCallback action, {Permission? permission}){
+      return InkWell(
+      onTap: (){
+          if(permission != null && !Groups.hasPermission(widget.user.group, permission)){
+              Util.showSnack(context, "No tienes permiso para acceder!");
+              return;
+          }
+          action();
+      },
       child: Ink(
         height: 160,
         width: 160,
@@ -199,22 +210,20 @@ class TileMain extends StatelessWidget{
       ),
     );
   }
-}
 
 
+  InkWell getTileMenu(IconData icon, String text, VoidCallback action, {Permission? permission}){
+      return InkWell(
+            onTap: (){
 
-class TileMenu extends StatelessWidget{
-      final IconData icon;
-      final String text;
-      final VoidCallback onTap;
+                if(permission != null && !Groups.hasPermission(widget.user.group, permission)){
+                    Util.popDialog(context);
+                    Util.showSnack(context, "No tienes permiso para acceder!");
+                    return;
+                }
 
-      const TileMenu(this.icon, this.text,
-          this.onTap, {Key? key}) : super(key: key);
-
-      @override
-      Widget build(BuildContext context) {
-        return InkWell(
-            onTap: onTap,
+                action();
+            },
             child: SizedBox(height: 50,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,6 +238,5 @@ class TileMenu extends StatelessWidget{
                     ])
                 ])
           ));
-    }
   }
-
+}

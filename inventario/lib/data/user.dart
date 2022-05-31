@@ -1,7 +1,7 @@
 class User {
 
-  int userid;
+  int userid, group;
   String username;
 
-  User(this.userid, this.username);
+  User(this.userid, this.group, this.username);
 }

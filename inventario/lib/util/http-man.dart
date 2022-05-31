@@ -85,7 +85,7 @@ class HttpMan {
             return null;
         }
 
-        return User(login[0]["id_staff"], login[0]["staff_login"]);
+        return User(login[0]["id_staff"], login[0]["person_group"], login[0]["staff_login"]);
     }
 
     static Future<String> performBackup() async {
